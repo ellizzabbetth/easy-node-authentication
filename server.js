@@ -14,6 +14,19 @@ var cookieParser = require('cookie-parser');
 var bodyParser   = require('body-parser');
 var session      = require('express-session');
 
+require('dotenv').load();
+//console.log("fb_secret " + process.env.FB_TEST);
+//const path          = require('path');
+//const mongoose      = require('mongoose');
+//const cors          = require('cors');
+
+/**
+ * Load environment variables from .env file, where API keys and passwords are configured.
+ */
+//dotenv.load({ path: '.env' });
+
+
+
 var configDB = require('./config/database.js');
 
 // configuration ===============================================================
