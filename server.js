@@ -14,6 +14,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser   = require('body-parser');
 var session      = require('express-session');
 
+// http://stackoverflow.com/questions/22312671/node-js-setting-environment-variables
 require('dotenv').load();
 //console.log("fb_secret " + process.env.FB_TEST);
 //const path          = require('path');
