@@ -23,6 +23,18 @@ module.exports = {
         'clientID'         : 'your-secret-clientID-here',
         'clientSecret'     : 'your-client-secret-here',
         'callbackURL'      : 'http://localhost:8080/auth/google/callback'
+    },
+
+  /*  'pinterestAuth' : {
+        'clientID'         : process.env.PINTEREST_CONSUMER_KEY,
+        'clientSecret'     : process.env.PINTEREST_CONSUMER_SECRET,
+        'callbackURL'      : 'http://localhost:8080/auth/google/callback'
+    }, */
+
+    'linkedinAuth': {
+        'clientID'         : process.env.LINKEDIN_CONSUMER_KEY,
+        'clientSecret'     : process.env.LINKEDIN_CONSUMER_SECRET,
+        'callbackURL'      : "http://127.0.0.1:8080/auth/linkedin/callback"
     }
 
 };

@@ -1,6 +1,6 @@
 module.exports = function(app, passport) {
 
-// normal routes ===============================================================
+    // normal routes ===============================================================
 
     // show the home page (will also have our login links)
     app.get('/', function(req, res) {
@@ -88,6 +88,30 @@ module.exports = function(app, passport) {
                 failureRedirect : '/'
             }));
 
+    // linkedin
+    /*    app.get('/auth/linkedin', passportLinkedIn.authenticate('linkedin'));
+
+        app.get('/auth/linkedin/callback',
+          passportLinkedIn.authenticate('linkedin', { failureRedirect: '/login' }),
+          function(req, res) {
+            // Successful authentication
+            res.json(req.user);
+        }); */
+        app.get('/auth/linkedin', passport.authenticate('linkedin'));
+
+        app.get('/auth/linkedin/callback',
+          passport.authenticate('linkedin', {
+            //failureRedirect: '/login'
+            successRedirect : '/profile',
+            failureRedirect : '/'
+          }),
+          function(req, res) {
+            // Successful authentication, redirect home.
+            console.log(" ??? ");
+            res.redirect('/');
+        });
+
+
 // =============================================================================
 // AUTHORIZE (ALREADY LOGGED IN / CONNECTING OTHER SOCIAL ACCOUNT) =============
 // =============================================================================
@@ -139,6 +163,18 @@ module.exports = function(app, passport) {
                 failureRedirect : '/'
             }));
 
+
+
+        // linkedin -------------------------------- TODO
+      /*  app.get('/connect/linkedin', passport.authorize('linkedin', { scope : ['profile', 'email'] }));
+
+        // the callback after google has authorized the user
+        app.get('/connect/google/callback',
+            passport.authorize('google', {
+                successRedirect : '/profile',
+                failureRedirect : '/'
+            })); */
+
 // =============================================================================
 // UNLINK ACCOUNTS =============================================================
 // =============================================================================
@@ -183,6 +219,14 @@ module.exports = function(app, passport) {
         });
     });
 
+   // linkedin ---------------------------------
+   app.get('/unlink/linkedin', isLoggedIn, function(req, res) {
+       var user          = req.user;
+       user.linkedin.token = undefined;
+       user.save(function(err) {
+           res.redirect('/profile');
+       });
+   });
 
 };
 

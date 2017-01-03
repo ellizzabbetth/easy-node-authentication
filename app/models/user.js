@@ -26,6 +26,13 @@ var userSchema = mongoose.Schema({
         token        : String,
         email        : String,
         name         : String
+    },
+    // linkedin Not sure about these fields
+    linkedin           : {
+        id           : String,
+        token        : String,
+        email        : String,
+        name         : String
     }
 
 });

@@ -3,6 +3,8 @@ var LocalStrategy    = require('passport-local').Strategy;
 var FacebookStrategy = require('passport-facebook').Strategy;
 var TwitterStrategy  = require('passport-twitter').Strategy;
 var GoogleStrategy   = require('passport-google-oauth').OAuth2Strategy;
+//var PinterestStrategy = require('')
+var LinkedinStrategy = require('passport-linkedin').Strategy;
 
 // load up the user model
 var User       = require('../app/models/user');
@@ -114,7 +116,7 @@ module.exports = function(passport) {
                 User.findOne({ 'local.email' :  email }, function(err, user) {
                     if (err)
                         return done(err);
-                    
+
                     if (user) {
                         return done(null, false, req.flash('loginMessage', 'That email is already taken.'));
                         // Using 'loginMessage instead of signupMessage because it's used by /connect/local'
@@ -125,7 +127,7 @@ module.exports = function(passport) {
                         user.save(function (err) {
                             if (err)
                                 return done(err);
-                            
+
                             return done(null,user);
                         });
                     }
@@ -168,7 +170,7 @@ module.exports = function(passport) {
                             user.save(function(err) {
                                 if (err)
                                     return done(err);
-                                    
+
                                 return done(null, user);
                             });
                         }
@@ -186,7 +188,7 @@ module.exports = function(passport) {
                         newUser.save(function(err) {
                             if (err)
                                 return done(err);
-                                
+
                             return done(null, newUser);
                         });
                     }
@@ -204,7 +206,7 @@ module.exports = function(passport) {
                 user.save(function(err) {
                     if (err)
                         return done(err);
-                        
+
                     return done(null, user);
                 });
 
@@ -246,7 +248,7 @@ module.exports = function(passport) {
                             user.save(function(err) {
                                 if (err)
                                     return done(err);
-                                    
+
                                 return done(null, user);
                             });
                         }
@@ -264,7 +266,7 @@ module.exports = function(passport) {
                         newUser.save(function(err) {
                             if (err)
                                 return done(err);
-                                
+
                             return done(null, newUser);
                         });
                     }
@@ -282,7 +284,7 @@ module.exports = function(passport) {
                 user.save(function(err) {
                     if (err)
                         return done(err);
-                        
+
                     return done(null, user);
                 });
             }
@@ -325,7 +327,7 @@ module.exports = function(passport) {
                             user.save(function(err) {
                                 if (err)
                                     return done(err);
-                                    
+
                                 return done(null, user);
                             });
                         }
@@ -342,7 +344,7 @@ module.exports = function(passport) {
                         newUser.save(function(err) {
                             if (err)
                                 return done(err);
-                                
+
                             return done(null, newUser);
                         });
                     }
@@ -360,7 +362,7 @@ module.exports = function(passport) {
                 user.save(function(err) {
                     if (err)
                         return done(err);
-                        
+
                     return done(null, user);
                 });
 
@@ -369,5 +371,41 @@ module.exports = function(passport) {
         });
 
     }));
+
+// http://mherman.org/blog/2015/09/26/social-authentication-in-node-dot-js-with-passport/#.WGqYCfkrLIU
+    // =========================================================================
+    // LINKEDIN ==================================================================
+    // =========================================================================
+   passport.use(new LinkedinStrategy({
+      consumerKey   : configAuth.linkedinAuth.clientID,
+      consumerSecret: configAuth.linkedinAuth.clientSecret,
+      callbackURL   : configAuth.linkedinAuth.callbackURL
+    },
+    // linkedin sends back the tokens and progile info
+    function(token, tokenSecret, profile, done) {
+
+     var searchQuery = {
+        name: profile.displayName
+      };
+
+    var updates = {
+      name: profile.displayName,
+      someID: profile.id
+    };
+
+    var options = {
+      upsert: true
+    };
+
+    // update the user if s/he exists or add a new user
+    User.findOneAndUpdate(searchQuery, updates, options, function(err, user) {
+      if(err) {
+        return done(err);
+      } else {
+        return done(null, user);
+      }
+    });
+  }));
+
 
 };
