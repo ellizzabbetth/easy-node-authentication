@@ -8,13 +8,91 @@
         body         { padding-top:80px; word-wrap:break-word; }
     </style>
 </head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script>
+$(document).ready(function(){
+
+  $.ajaxSetup({ cache: true });
+  $.getScript('//connect.facebook.net/en_US/sdk.js', function(){
+    FB.init({
+      appId: '210137632780298',
+      status : true, // check login status
+      cookie : true, // enable cookies to allow the server to access the session
+      xfbml  : true,  // parse XFBML
+      version: 'v2.7' // or v2.1, v2.2, v2.3, ...
+    });
+    $('#loginbutton, #feedbutton').removeAttr('disabled');
+    FB.getLoginStatus(updateStatusCallback);
+
+  });
+
+  // http://stackoverflow.com/questions/20986278/updatestatuscallback-not-defined-on-facebook-examble-of-jquery
+  function updateStatusCallback(){
+    // alert('Status updated!!');
+    // Your logic here
+  }
+
+
+
+
+
+
+
+
+});
+</script>
+
+<button onclick="myFacebookLogin()">Login with Facebook</button>
+<button type="button" onclick="fblogin();">Facebook Login</button>
+<!-- http://stackoverflow.com/questions/4909638/facebook-login-button-error-fb-login-called-before-calling-fb-init -->
+<script>
+
+
+function myFacebookLogin() {
+  // https://developers.facebook.com/docs/javascript/examples
+  FB.login(function(){
+  // Note: The call will only work if you accept the permission request
+  FB.api('/me/feed', 'post', {message: 'Hello, world!'});
+  }, {scope: 'publish_actions'});
+}
+
+//your fb login function
+function fblogin() {
+  FB.login(function(response) {
+    //User logged in!
+    if (response.session) {
+       alert('YAY!');
+    } else {
+      // user cancelled login
+      alert('NAY! User login cancelled.' + response);
+    }
+  }, { perms:'email, read_stream, publish_stream' });
+}
+/*
+FB.api('/me?fields=id,name,email', function(response) {
+  console.log(response);
+});
+*/
+
+  FB.api("/v2.7/me HTTP/1.1", function(data, status){
+    alert("Data: " + data + "\nStatus: " + status);
+  });
+
+</script>
+
 <body>
+
+
 <div class="container">
 
     <div class="page-header text-center">
         <h1><span class="fa fa-anchor"></span> Profile Page</h1>
         <a href="/logout" class="btn btn-default btn-sm">Logout</a>
     </div>
+
+
+    <div id="div1"><h2>Let jQuery AJAX Change This Text</h2></div>
+    <button>Get External Content</button>
 
     <div class="row">
 
@@ -29,7 +107,7 @@
                         <strong>email</strong>: <%= user.local.email %><br>
                         <strong>password</strong>: <%= user.local.password %>
                     </p>
-                    
+
                     <a href="/unlink/local" class="btn btn-default">Unlink</a>
                 <% } else { %>
                     <a href="/connect/local" class="btn btn-default">Connect Local</a>
@@ -99,6 +177,27 @@
                     <a href="/unlink/google" class="btn btn-danger">Unlink</a>
                 <% } else { %>
                     <a href="/connect/google" class="btn btn-danger">Connect Google</a>
+                <% } %>
+
+            </div>
+        </div>
+
+        <!-- LINKEDIN INFORMATION -->
+        <div class="col-sm-6">
+            <div class="well">
+                <h3 class="text-danger"><span class="fa fa-linkedin"></span> LinkedIn</h3>
+
+                <% if (user.linkedin.token) { %>
+                    <p>
+                        <strong>id</strong>: <%= user.linkedin.id %><br>
+                        <strong>token</strong>: <%= user.linkedin.token %><br>
+                        <strong>email</strong>: <%= user.linkedin.email %><br>
+                        <strong>name</strong>: <%= user.linkedin.name %>
+                    </p>
+
+                    <a href="/unlink/linkedin" class="btn btn-danger">Unlink</a>
+                <% } else { %>
+                    <a href="/connect/linkedin" class="btn btn-danger">Connect Linkedin</a>
                 <% } %>
 
             </div>

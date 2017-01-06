@@ -9,7 +9,8 @@ module.exports = {
         'clientID'        : process.env.FACEBOOK_ID, // your App ID
         'clientSecret'    : process.env.FACEBOOK_SECRET, // your App Secret
         'callbackURL'     : 'http://localhost:8080/auth/facebook/callback',
-        'profileURL': 'https://graph.facebook.com/v2.5/me?fields=first_name,last_name,email'
+        'profileURL'      : 'https://graph.facebook.com/v2.5/me?fields=first_name,last_name,email',
+        'appID'           : process.env.FACEBOOK_APP_ID
 
     },
 

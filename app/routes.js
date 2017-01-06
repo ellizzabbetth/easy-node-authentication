@@ -9,6 +9,7 @@ module.exports = function(app, passport) {
 
     // PROFILE SECTION =========================
     app.get('/profile', isLoggedIn, function(req, res) {
+      console.log("DEBUG: /profile "+req.user);
         res.render('profile.ejs', {
             user : req.user
         });
@@ -97,18 +98,19 @@ module.exports = function(app, passport) {
             // Successful authentication
             res.json(req.user);
         }); */
-        app.get('/auth/linkedin', passport.authenticate('linkedin'));
+        app.get('/auth/linkedin', passport.authenticate('linkedin', { scope: ['r_basicprofile'] }));
 
         app.get('/auth/linkedin/callback',
           passport.authenticate('linkedin', {
             //failureRedirect: '/login'
+            //console.log("passport linkedin authenticate");
             successRedirect : '/profile',
             failureRedirect : '/'
           }),
           function(req, res) {
             // Successful authentication, redirect home.
             console.log(" ??? ");
-            res.redirect('/');
+            res.redirect('/profile');
         });
 
 
@@ -166,14 +168,14 @@ module.exports = function(app, passport) {
 
 
         // linkedin -------------------------------- TODO
-      /*  app.get('/connect/linkedin', passport.authorize('linkedin', { scope : ['profile', 'email'] }));
+        app.get('/connect/linkedin', passport.authorize('linkedin', { scope : 'profile' }));
 
         // the callback after google has authorized the user
-        app.get('/connect/google/callback',
-            passport.authorize('google', {
+        app.get('/connect/linkedin/callback',
+            passport.authorize('linkedin', {
                 successRedirect : '/profile',
                 failureRedirect : '/'
-            })); */
+            }));
 
 // =============================================================================
 // UNLINK ACCOUNTS =============================================================

@@ -22,11 +22,13 @@ module.exports = function(passport) {
 
     // used to serialize the user for the session
     passport.serializeUser(function(user, done) {
+        console.log("DEBUG: serialize User" + user);
         done(null, user.id);
     });
 
     // used to deserialize the user
     passport.deserializeUser(function(id, done) {
+        console.log("DEBUG: deserialize User "+id);
         User.findById(id, function(err, user) {
             done(err, user);
         });
@@ -148,7 +150,7 @@ module.exports = function(passport) {
     fbStrategy.passReqToCallback = true;  // allows us to pass in the req from our route (lets us check if a user is logged in or not)
     passport.use(new FacebookStrategy(fbStrategy,
     function(req, token, refreshToken, profile, done) {
-
+        console.log("DEBUG: "+ profile);
         // asynchronous
         process.nextTick(function() {
 
@@ -379,33 +381,50 @@ module.exports = function(passport) {
    passport.use(new LinkedinStrategy({
       consumerKey   : configAuth.linkedinAuth.clientID,
       consumerSecret: configAuth.linkedinAuth.clientSecret,
-      callbackURL   : configAuth.linkedinAuth.callbackURL
+      callbackURL   : configAuth.linkedinAuth.callbackURL,
+      scope: ['r_basicprofile'],
+      state: true,
+      passReqToCallback : true // allows us to pass in the req from our route (lets us check if a user is logged in or not)
+
     },
+
     // linkedin sends back the tokens and progile info
-    function(token, tokenSecret, profile, done) {
+    function(req, token, refreshToken, profile, done) {
+console.log("DEBUG: "+ refreshToken + ", "+ profile);
+         // make the code asynchronous
+         // User.findOne won't fire until we have all our data back from Linkedin
+         process.nextTick(function() {
 
-     var searchQuery = {
-        name: profile.displayName
-      };
+             // try to find the user based on their linkedin id
+             User.findOne({ 'linkedin.id' : profile.id }, function(err, user) {
+                 if (err)
+                     return done(err);
 
-    var updates = {
-      name: profile.displayName,
-      someID: profile.id
-    };
+                 if (user) {
+console.log("DEGUB: "+ user);
+                     // if a user is found, log them in
+                     return done(null, user);
+                 } else {
+                     // if the user isnt in our database, create a new user
+                     var newUser          = new User();
 
-    var options = {
-      upsert: true
-    };
+                     // set all of the relevant information
+                     newUser.linkedin.id    = profile.id;
+                     newUser.linkedin.token = token;
+                     newUser.linkedin.name  = profile.displayName;
+              //       newUser.linkedin.email = profile.emails[0].value; // pull the first email
 
-    // update the user if s/he exists or add a new user
-    User.findOneAndUpdate(searchQuery, updates, options, function(err, user) {
-      if(err) {
-        return done(err);
-      } else {
-        return done(null, user);
-      }
-    });
-  }));
+                     // save the user
+                     newUser.save(function(err) {
+                         if (err)
+                             throw err;
+                         return done(null, newUser);
+                     });
+                 }
+             });
+         });
+
+     }));
 
 
 };
